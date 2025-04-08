@@ -1,0 +1,108 @@
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:16:22
+Location: (30.6136, 76.1685)
+Heading: East
+Nearest Station: Ludhiana North
+Predicted Next Location: (30.6136, 76.2585)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:16:30
+Location: (31.9322, 76.2637)
+Heading: South
+Nearest Station: Jalandhar West
+Predicted Next Location: (31.8422, 76.2637)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:16:48
+Location: (31.6754, 75.6067)
+Heading: East
+Nearest Station: Jalandhar West
+Predicted Next Location: (31.6754, 75.6967)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:17:22
+Location: (31.7434, 76.0468)
+Heading: South
+Nearest Station: Jalandhar West
+Predicted Next Location: (31.6534, 76.0468)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:18:00
+Location: (31.2514, 76.0686)
+Heading: South
+Nearest Station: Ludhiana North
+Predicted Next Location: (31.1614, 76.0686)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:18:24
+Location: (30.7505, 75.5493)
+Heading: East
+Nearest Station: Ludhiana North
+Predicted Next Location: (30.7505, 75.6393)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:19:02
+Location: (30.5130, 74.6955)
+Heading: North
+Nearest Station: Ludhiana North
+Predicted Next Location: (30.6030, 74.6955)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:20:20
+Location: (31.4617, 74.6696)
+Heading: West
+Nearest Station: Amritsar Central
+Predicted Next Location: (31.4617, 74.5796)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:20:44
+Location: (31.7141, 75.0428)
+Heading: East
+Nearest Station: Amritsar Central
+Predicted Next Location: (31.7141, 75.1328)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:21:22
+Location: (30.5032, 75.7372)
+Heading: North
+Nearest Station: Ludhiana North
+Predicted Next Location: (30.5932, 75.7372)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:22:05
+Location: (31.5421, 75.4961)
+Heading: North
+Nearest Station: Jalandhar West
+Predicted Next Location: (31.6321, 75.4961)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:22:13
+Location: (30.9102, 74.9688)
+Heading: South
+Nearest Station: Jalandhar West
+Predicted Next Location: (30.8202, 74.9688)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:22:37
+Location: (30.7865, 76.4870)
+Heading: West
+Nearest Station: Ludhiana North
+Predicted Next Location: (30.7865, 76.3970)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:22:50
+Location: (31.5199, 75.1026)
+Heading: North
+Nearest Station: Amritsar Central
+Predicted Next Location: (31.6099, 75.1026)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:22:58
+Location: (30.7045, 75.5467)
+Heading: North
+Nearest Station: Ludhiana North
+Predicted Next Location: (30.7945, 75.5467)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:23:16
+Location: (30.6236, 74.5609)
+Heading: South
+Nearest Station: Amritsar Central
+Predicted Next Location: (30.5336, 74.5609)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:23:24
+Location: (30.9474, 75.0670)
+Heading: North
+Nearest Station: Jalandhar West
+Predicted Next Location: (31.0374, 75.0670)
+ALERT SENT: Stolen vehicle PB02AB1234
+Time: 2025-04-08 11:23:48
+Location: (30.8572, 75.0445)
+Heading: North
+Nearest Station: Jalandhar West
+Predicted Next Location: (30.9472, 75.0445)

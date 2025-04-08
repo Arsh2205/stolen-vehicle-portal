@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Detections - Stolen Vehicle Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .detection,
+        .alert {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .detection {
+            background-color: #f9f9f9;
+        }
+
+        .alert {
+            background-color: #ffe6e6;
+        }
+
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Stolen Vehicle Detections & Alerts</h1>
+    <p><a href="/">Back to Home</a></p>
+    <h2>Detections</h2>
+    {% if detections %}
+    {% for detection in detections %}
+    <div class="detection">
+        <pre>{{ detection }}</pre>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No stolen vehicles detected yet.</p>
+    {% endif %}
+    <h2>Alerts Sent</h2>
+    {% if alerts %}
+    {% for alert in alerts %}
+    <div class="alert">
+        <pre>{{ alert }}</pre>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No alerts sent yet.</p>
+    {% endif %}
+</body>
+
+</html>
