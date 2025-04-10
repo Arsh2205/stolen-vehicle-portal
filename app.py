@@ -223,4 +223,4 @@ if __name__ == "__main__":
     for f in [DETECTIONS_FILE, ALERTS_FILE]:
         if os.path.exists(f):
             os.remove(f)
-    app.run(debug=False, host="0.0.0.0", port=port)
+    app.run(debug=False, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
