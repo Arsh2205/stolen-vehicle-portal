@@ -93,6 +93,10 @@
                 <input type="text" name="number_plate" required style="width: 100%; padding: 5px;"><br><br>
                 <label>Owner Name:</label><br>
                 <input type="text" name="owner_name" required style="width: 100%; padding: 5px;"><br><br>
+                <label>Model (optional):</label><br>
+                <input type="text" name="model" style="width: 100%; padding: 5px;"><br><br>
+                <label>Color (optional):</label><br>
+                <input type="text" name="color" style="width: 100%; padding: 5px;"><br><br>
                 <label>Description (optional):</label><br>
                 <textarea name="description" style="width: 100%; height: 100px; padding: 5px;"></textarea><br><br>
                 <input type="submit" value="Report Vehicle"
@@ -109,6 +113,8 @@
                 <th>Number Plate</th>
                 <th>Owner Name</th>
                 <th>Report Date</th>
+                <th>Model</th>
+                <th>Color</th>
                 <th>Description</th>
             </tr>
             {% for vehicle in vehicles %}
@@ -116,6 +122,8 @@
                 <td>{{ vehicle[0] }}</td>
                 <td>{{ vehicle[1] }}</td>
                 <td>{{ vehicle[2] }}</td>
+                <td>{{ vehicle[4] }}</td>
+                <td>{{ vehicle[5] }}</td>
                 <td>{{ vehicle[3] }}</td>
             </tr>
             {% endfor %}
@@ -125,7 +133,7 @@
         {% endif %}
     </div>
     <footer>
-        <p>&copy; 2025 Stolen Vehicle Portal | Powered by xAI</p>
+        <p>© 2025 Stolen Vehicle Portal | Powered by xAI</p>
     </footer>
 </body>
 

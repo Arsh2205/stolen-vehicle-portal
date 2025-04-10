@@ -106,3 +106,141 @@ Time: 2025-04-08 11:23:48
 Location: (30.8572, 75.0445)
 Heading: North
 Nearest Station: Jalandhar West (72.67 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:24:31
+Location: (30.7313, 75.5551)
+Heading: East
+Nearest Station: Ludhiana North (34.48 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:24:49
+Location: (30.8665, 75.9387)
+Heading: South
+Nearest Station: Ludhiana North (8.66 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:24:58
+Location: (31.9476, 75.2731)
+Heading: West
+Nearest Station: Amritsar Central (51.49 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:25:36
+Location: (31.2208, 75.5185)
+Heading: West
+Nearest Station: Jalandhar West (12.92 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:27:29
+Location: (31.8364, 75.3615)
+Heading: North
+Nearest Station: Amritsar Central (51.44 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:27:43
+Location: (31.4276, 76.2206)
+Heading: West
+Nearest Station: Jalandhar West (62.21 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:28:01
+Location: (30.7479, 75.6884)
+Heading: South
+Nearest Station: Ludhiana North (23.45 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:28:50
+Location: (31.9256, 76.1081)
+Heading: North
+Nearest Station: Jalandhar West (83.56 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:29:20
+Location: (30.6528, 74.5712)
+Heading: North
+Nearest Station: Amritsar Central (112.80 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:29:53
+Location: (30.5722, 75.1932)
+Heading: East
+Nearest Station: Ludhiana North (73.25 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:30:07
+Location: (31.5428, 75.5421)
+Heading: East
+Nearest Station: Jalandhar West (24.32 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:30:25
+Location: (30.5479, 75.2463)
+Heading: South
+Nearest Station: Ludhiana North (70.37 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:30:43
+Location: (31.2774, 75.3219)
+Heading: East
+Nearest Station: Jalandhar West (24.76 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:31:36
+Location: (31.9044, 75.3150)
+Heading: South
+Nearest Station: Amritsar Central (51.53 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:32:09
+Location: (31.7145, 75.5144)
+Heading: East
+Nearest Station: Jalandhar West (43.59 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:33:38
+Location: (31.9292, 75.1814)
+Heading: West
+Nearest Station: Amritsar Central (43.94 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 11:33:52
+Location: (31.2382, 74.7889)
+Heading: East
+Nearest Station: Amritsar Central (44.71 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 18:13:19
+Location: (31.5580, 75.4215)
+Heading: East
+Nearest Station: Jalandhar West (29.67 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 18:13:29
+Location: (31.6925, 76.3076)
+Heading: East
+Nearest Station: Jalandhar West (80.43 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 18:14:24
+Location: (31.3334, 75.4021)
+Heading: North
+Nearest Station: Jalandhar West (16.56 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 18:15:17
+Location: (30.6867, 75.0352)
+Heading: West
+Nearest Station: Ludhiana North (82.07 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 18:15:55
+Location: (31.5579, 76.2150)
+Heading: North
+Nearest Station: Jalandhar West (65.86 km)
+DETECTION: Stolen vehicle PB02AB1234 spotted!
+Owner: John Doe
+Time: 2025-04-08 18:17:23
+Location: (31.2723, 74.6329)
+Heading: South
+Nearest Station: Amritsar Central (46.18 km)
