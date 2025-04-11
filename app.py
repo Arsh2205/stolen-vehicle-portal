@@ -33,23 +33,31 @@ EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT", "your.email@gmail.com")
 # Logging setup
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Initialize database
+# Initialize and migrate database
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
+    # Create table if it doesn't exist
     c.execute('''CREATE TABLE IF NOT EXISTS vehicles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         number_plate TEXT UNIQUE,
         owner_name TEXT,
         report_date TEXT,
-        description TEXT,
-        model TEXT DEFAULT 'Unknown',
-        color TEXT DEFAULT 'Unknown'
+        description TEXT
     )''')
+    # Add model and color columns if they don't exist
+    try:
+        c.execute("ALTER TABLE vehicles ADD COLUMN model TEXT DEFAULT 'Unknown'")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    try:
+        c.execute("ALTER TABLE vehicles ADD COLUMN color TEXT DEFAULT 'Unknown'")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     conn.commit()
     conn.close()
 
-# Mock challan sighting (for now)
+# Mock challan sighting
 def generate_mock_sighting():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
@@ -153,8 +161,11 @@ def check_sightings():
                     f"Heading: {sighting['direction']}\n"
                     f"Nearest Station: {nearest_station} ({distance:.2f} km)"
                 )
-                with open(DETECTIONS_FILE, "a") as f:
-                    f.write(detection + "\n")
+                try:
+                    with open(DETECTIONS_FILE, "a") as f:
+                        f.write(detection + "\n")
+                except Exception as e:
+                    logging.error(f"Failed to write detection: {e}")
 
                 next_location = predict_next_location(sighting["location"], sighting["direction"])
                 alert = (
@@ -165,8 +176,11 @@ def check_sightings():
                     f"Nearest Station: {nearest_station}\n"
                     f"Predicted Next Location: ({next_location[0]:.4f}, {next_location[1]:.4f})"
                 )
-                with open(ALERTS_FILE, "a") as f:
-                    f.write(alert + "\n")
+                try:
+                    with open(ALERTS_FILE, "a") as f:
+                        f.write(alert + "\n")
+                except Exception as e:
+                    logging.error(f"Failed to write alert: {e}")
                 send_alert_email(number_plate, owner_name, sighting, nearest_station, model, color)
             time.sleep(5)
         except Exception as e:
@@ -197,6 +211,9 @@ def home():
         except sqlite3.IntegrityError:
             message = f"Error: Vehicle {number_plate} already reported."
             logging.warning(f"Duplicate report attempt: {number_plate}")
+        except Exception as e:
+            message = f"Error reporting vehicle: {e}"
+            logging.error(f"Report failed: {e}")
         finally:
             conn.close()
 
@@ -212,14 +229,17 @@ def home():
 def detections():
     detections = []
     alerts = []
-    if os.path.exists(DETECTIONS_FILE):
-        with open(DETECTIONS_FILE, "r") as f:
-            content = f.read().strip().split("\n\n")
-            detections = [d.strip() for d in content if d.strip()]
-    if os.path.exists(ALERTS_FILE):
-        with open(ALERTS_FILE, "r") as f:
-            content = f.read().strip().split("\n\n")
-            alerts = [a.strip() for a in content if a.strip()]
+    try:
+        if os.path.exists(DETECTIONS_FILE):
+            with open(DETECTIONS_FILE, "r") as f:
+                content = f.read().strip().split("\n\n")
+                detections = [d.strip() for d in content if d.strip()]
+        if os.path.exists(ALERTS_FILE):
+            with open(ALERTS_FILE, "r") as f:
+                content = f.read().strip().split("\n\n")
+                alerts = [a.strip() for a in content if a.strip()]
+    except Exception as e:
+        logging.error(f"Failed to read detections/alerts: {e}")
     return render_template("detections.html", detections=detections, alerts=alerts)
 
 # Start background thread
@@ -228,6 +248,9 @@ threading.Thread(target=check_sightings, daemon=True).start()
 if __name__ == "__main__":
     for f in [DETECTIONS_FILE, ALERTS_FILE, LOG_FILE]:
         if os.path.exists(f):
-            os.remove(f)
+            try:
+                os.remove(f)
+            except:
+                pass
     port = int(os.getenv("PORT", 5000))
     app.run(debug=False, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
