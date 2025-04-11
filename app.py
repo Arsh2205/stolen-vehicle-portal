@@ -13,15 +13,12 @@ import json
 
 app = Flask(__name__)
 
-# File paths
-DB_FILE = "/var/data/stolen_vehicles.db"  # Persistent storage on Render
-DETECTIONS_FILE = "/var/data/detections.txt"
-ALERTS_FILE = "/var/data/alerts.txt"
-LOG_FILE = "/var/data/app.log"
-STATIONS_FILE = "police_stations.json"
-
-# Ensure data directory exists
-os.makedirs("/var/data", exist_ok=True)
+# File paths (use /tmp for Render free tier)
+DB_FILE = "/tmp/stolen_vehicles.db"
+DETECTIONS_FILE = "/tmp/detections.txt"
+ALERTS_FILE = "/tmp/alerts.txt"
+LOG_FILE = "/tmp/app.log"
+STATIONS_FILE = "/tmp/police_stations.json"
 
 # Load police stations
 def load_police_stations():
@@ -30,7 +27,6 @@ def load_police_stations():
             with open(STATIONS_FILE, "r") as f:
                 return json.load(f)
         else:
-            # Default stations if file=20
             default_stations = {
                 "Amritsar Central": {"coords": (31.6340, 74.8723), "email": "amritsar.police@example.com"},
                 "Ludhiana North": {"coords": (30.9010, 75.8573), "email": "ludhiana.police@example.com"},
@@ -266,7 +262,7 @@ def detections():
 threading.Thread(target=check_sightings, daemon=True).start()
 
 if __name__ == "__main__":
-    for f in [DETECTIONS_FILE, ALERTS_FILE, LOG_FILE]:
+    for f in [DETECTIONS_FILE, ALERTS_FILE, LOG_FILE, STATIONS_FILE]:
         if os.path.exists(f):
             try:
                 os.remove(f)
