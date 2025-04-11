@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>System Status - Stolen Vehicle Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>System Status</h1>
+        <p><a href="/" style="color: white;">Back to Home</a> | <a href="/detections"
+                style="color: white;">Detections</a></p>
+    </header>
+    <div class="container">
+        <h2>System Health</h2>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>Database</td>
+                <td>{{ status.database }}</td>
+            </tr>
+            <tr>
+                <td>Detections File</td>
+                <td>{{ status.detections_file }}</td>
+            </tr>
+            <tr>
+                <td>Alerts File</td>
+                <td>{{ status.alerts_file }}</td>
+            </tr>
+            <tr>
+                <td>Police Stations</td>
+                <td>{{ status.police_stations }}</td>
+            </tr>
+            <tr>
+                <td>Email Configuration</td>
+                <td>{{ status.email_config }}</td>
+            </tr>
+            <tr>
+                <td>Last Log Entry</td>
+                <td>{{ status.last_log }}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

@@ -13,7 +13,7 @@ import json
 
 app = Flask(__name__)
 
-# File paths (use /tmp for Render free tier)
+# File paths (using /tmp for Render free tier)
 DB_FILE = "/tmp/stolen_vehicles.db"
 DETECTIONS_FILE = "/tmp/detections.txt"
 ALERTS_FILE = "/tmp/alerts.txt"
@@ -258,6 +258,25 @@ def detections():
         logging.error(f"Failed to read detections/alerts: {e}")
     return render_template("detections.html", detections=detections, alerts=alerts)
 
+# Status page
+@app.route("/status")
+def status():
+    status_info = {
+        "database": "OK" if os.path.exists(DB_FILE) else "Not Found",
+        "detections_file": "OK" if os.path.exists(DETECTIONS_FILE) else "Not Found",
+        "alerts_file": "OK" if os.path.exists(ALERTS_FILE) else "Not Found",
+        "police_stations": "OK" if POLICE_STATIONS else "Not Loaded",
+        "email_config": "OK" if EMAIL_SENDER and EMAIL_PASSWORD and EMAIL_RECIPIENT else "Missing Variables",
+        "last_log": "None"
+    }
+    try:
+        with open(LOG_FILE, "r") as f:
+            lines = f.readlines()
+            status_info["last_log"] = lines[-1].strip() if lines else "No logs yet"
+    except Exception as e:
+        status_info["last_log"] = f"Error reading logs: {e}"
+    return render_template("status.html", status=status_info)
+
 # Start background thread
 threading.Thread(target=check_sightings, daemon=True).start()
 
@@ -269,4 +288,4 @@ if __name__ == "__main__":
             except:
                 pass
     port = int(os.getenv("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    app.run(debug=False, host="0.0.0.0", port = int(os.getenv("PORT", 5000)))
