@@ -9,21 +9,41 @@ import math
 import smtplib
 from email.mime.text import MIMEText
 import logging
+import json
 
 app = Flask(__name__)
 
 # File paths
-DB_FILE = "stolen_vehicles.db"
-DETECTIONS_FILE = "detections.txt"
-ALERTS_FILE = "alerts.txt"
-LOG_FILE = "app.log"
+DB_FILE = "/var/data/stolen_vehicles.db"  # Persistent storage on Render
+DETECTIONS_FILE = "/var/data/detections.txt"
+ALERTS_FILE = "/var/data/alerts.txt"
+LOG_FILE = "/var/data/app.log"
+STATIONS_FILE = "police_stations.json"
 
-# Mock police stations (lat, long, email)
-POLICE_STATIONS = {
-    "Amritsar Central": {"coords": (31.6340, 74.8723), "email": "amritsar.police@example.com"},
-    "Ludhiana North": {"coords": (30.9010, 75.8573), "email": "ludhiana.police@example.com"},
-    "Jalandhar West": {"coords": (31.3260, 75.5762), "email": "jalandhar.police@example.com"}
-}
+# Ensure data directory exists
+os.makedirs("/var/data", exist_ok=True)
+
+# Load police stations
+def load_police_stations():
+    try:
+        if os.path.exists(STATIONS_FILE):
+            with open(STATIONS_FILE, "r") as f:
+                return json.load(f)
+        else:
+            # Default stations if file=20
+            default_stations = {
+                "Amritsar Central": {"coords": (31.6340, 74.8723), "email": "amritsar.police@example.com"},
+                "Ludhiana North": {"coords": (30.9010, 75.8573), "email": "ludhiana.police@example.com"},
+                "Jalandhar West": {"coords": (31.3260, 75.5762), "email": "jalandhar.police@example.com"}
+            }
+            with open(STATIONS_FILE, "w") as f:
+                json.dump(default_stations, f)
+            return default_stations
+    except Exception as e:
+        logging.error(f"Failed to load police stations: {e}")
+        return {}
+
+POLICE_STATIONS = load_police_stations()
 
 # Email config from environment variables
 EMAIL_SENDER = os.getenv("EMAIL_SENDER", "your.email@gmail.com")
@@ -37,23 +57,23 @@ logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format="%(asctime)s -
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    # Create table if it doesn't exist
     c.execute('''CREATE TABLE IF NOT EXISTS vehicles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         number_plate TEXT UNIQUE,
         owner_name TEXT,
         report_date TEXT,
-        description TEXT
+        description TEXT,
+        model TEXT DEFAULT 'Unknown',
+        color TEXT DEFAULT 'Unknown'
     )''')
-    # Add model and color columns if they don't exist
     try:
         c.execute("ALTER TABLE vehicles ADD COLUMN model TEXT DEFAULT 'Unknown'")
     except sqlite3.OperationalError:
-        pass  # Column already exists
+        pass
     try:
         c.execute("ALTER TABLE vehicles ADD COLUMN color TEXT DEFAULT 'Unknown'")
     except sqlite3.OperationalError:
-        pass  # Column already exists
+        pass
     conn.commit()
     conn.close()
 
@@ -253,4 +273,4 @@ if __name__ == "__main__":
             except:
                 pass
     port = int(os.getenv("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    app.run(debug=False, host="0.0.0.0", port=port)
