@@ -230,4 +230,4 @@ if __name__ == "__main__":
         if os.path.exists(f):
             os.remove(f)
     port = int(os.getenv("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=port)
+    app.run(debug=False, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
