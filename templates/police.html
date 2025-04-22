@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Police Panel - Stolen Vehicle Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Police Panel</h1>
+        <p><a href="/status" style="color: white;">Status</a></p>
+    </header>
+    <div class="container">
+        <h2>Stolen Vehicle Alerts</h2>
+        <table>
+            <tr>
+                <th>Number Plate</th>
+                <th>Owner</th>
+                <th>Model</th>
+                <th>Color</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>Heading</th>
+                <th>Station</th>
+                <th>Status</th>
+                <th>Documents</th>
+                <th>Action</th>
+            </tr>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert[1] }}</td>
+                <td>{{ alert[2] }}</td>
+                <td>{{ alert[3] }}</td>
+                <td>{{ alert[4] }}</td>
+                <td>{{ alert[5] }}</td>
+                <td>({{ alert[6] | round(4) }}, {{ alert[7] | round(4) }})</td>
+                <td>{{ alert[8] }}</td>
+                <td>{{ alert[9] }}</td>
+                <td>{{ alert[10] }}</td>
+                <td>
+                    {% if alert[11] %}<a href="/{{ alert[11] }}">RC</a>{% endif %}
+                    {% if alert[12] %}<a href="/{{ alert[12] }}">FIR</a>{% endif %}
+                </td>
+                <td>
+                    <form method="POST">
+                        <input type="hidden" name="alert_id" value="{{ alert[0] }}">
+                        <select name="status">
+                            <option value="Pending" {% if alert[10]=='Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Action Taken" {% if alert[10]=='Action Taken' %}selected{% endif %}>Action
+                                Taken</option>
+                            <option value="Vehicle Found" {% if alert[10]=='Vehicle Found' %}selected{% endif %}>Vehicle
+                                Found</option>
+                        </select>
+                        <input type="submit" value="Update">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <footer>
+        <p>© 2025 Stolen Vehicle Portal | Powered by xAI</p>
+    </footer>
+</body>
+
+</html>

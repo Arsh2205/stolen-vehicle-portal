@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Panel - Stolen Vehicle Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <p><a href="/status" style="color: white;">Status</a></p>
+    </header>
+    <div class="container">
+        <h2>Users</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Phone</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h2>Vehicles</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Number Plate</th>
+                <th>Owner</th>
+                <th>Model</th>
+                <th>Color</th>
+                <th>Report Date</th>
+            </tr>
+            {% for vehicle in vehicles %}
+            <tr>
+                <td>{{ vehicle[0] }}</td>
+                <td>{{ vehicle[1] }}</td>
+                <td>{{ vehicle[2] }}</td>
+                <td>{{ vehicle[3] }}</td>
+                <td>{{ vehicle[4] }}</td>
+                <td>{{ vehicle[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h2>Alerts</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Number Plate</th>
+                <th>Station</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert[0] }}</td>
+                <td>{{ alert[1] }}</td>
+                <td>{{ alert[2] }}</td>
+                <td>{{ alert[3] }}</td>
+                <td>{{ alert[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h2>Analytics</h2>
+        <table>
+            <tr>
+                <th>Station</th>
+                <th>Alert Count</th>
+            </tr>
+            {% for stat in analytics %}
+            <tr>
+                <td>{{ stat[0] }}</td>
+                <td>{{ stat[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h2>Police Stations</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Coordinates</th>
+                <th>Email</th>
+            </tr>
+            {% for name, data in police_stations.items() %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>({{ data.coords[0] }}, {{ data.coords[1] }})</td>
+                <td>{{ data.email }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <footer>
+        <p>© 2025 Stolen Vehicle Portal | Powered by xAI</p>
+    </footer>
+</body>
+
+</html>

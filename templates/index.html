@@ -27,10 +27,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .form-container {
-            margin-bottom: 20px;
-        }
-
         .message {
             color: green;
         }
@@ -78,58 +74,106 @@
             }
         }
     </style>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    document.getElementById("lat").value = position.coords.latitude;
+                    document.getElementById("lon").value = position.coords.longitude;
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
 </head>
 
 <body>
     <header>
         <h1>Stolen Vehicle Reporting Portal</h1>
-        <p><a href="/detections" style="color: white;">View Detections</a></p>
+        <p>
+            <a href="/detections" style="color: white;">Detections</a> |
+            <a href="/status" style="color: white;">Status</a> |
+            <a href="/logout" style="color: white;">Logout</a>
+        </p>
     </header>
     <div class="container">
-        <div class="form-container">
-            <h2>Report a Stolen Vehicle</h2>
-            <form method="POST">
-                <label>Number Plate:</label><br>
-                <input type="text" name="number_plate" required style="width: 100%; padding: 5px;"><br><br>
-                <label>Owner Name:</label><br>
-                <input type="text" name="owner_name" required style="width: 100%; padding: 5px;"><br><br>
-                <label>Model (optional):</label><br>
-                <input type="text" name="model" style="width: 100%; padding: 5px;"><br><br>
-                <label>Color (optional):</label><br>
-                <input type="text" name="color" style="width: 100%; padding: 5px;"><br><br>
-                <label>Description (optional):</label><br>
-                <textarea name="description" style="width: 100%; height: 100px; padding: 5px;"></textarea><br><br>
-                <input type="submit" value="Report Vehicle"
-                    style="padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">
-            </form>
-            {% if message %}
-            <p class="{{ 'message' if 'successfully' in message else 'error' }}">{{ message }}</p>
-            {% endif %}
-        </div>
-        <h2>Reported Stolen Vehicles</h2>
+        <h2>Report a Stolen Vehicle</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Number Plate:</label><br>
+            <input type="text" name="number_plate" required style="width: 100%; padding: 5px;"><br><br>
+            <label>Owner Name:</label><br>
+            <input type="text" name="owner_name" required style="width: 100%; padding: 5px;"><br><br>
+            <label>Model:</label><br>
+            <input type="text" name="model" style="width: 100%; padding: 5px;"><br><br>
+            <label>Color:</label><br>
+            <input type="text" name="color" style="width: 100%; padding: 5px;"><br><br>
+            <label>Description:</label><br>
+            <textarea name="description" style="width: 100%; height: 100px; padding: 5px;"></textarea><br><br>
+            <label>RC Document (PDF/Image):</label><br>
+            <input type="file" name="rc" accept=".pdf,.jpg,.jpeg,.png"><br><br>
+            <label>FIR Document (PDF/Image):</label><br>
+            <input type="file" name="fir" accept=".pdf,.jpg,.jpeg,.png"><br><br>
+            <label>Location:</label><br>
+            <input type="text" id="lat" name="lat" placeholder="Latitude" style="width: 48%; padding: 5px;">
+            <input type="text" id="lon" name="lon" placeholder="Longitude" style="width: 48%; padding: 5px;"><br>
+            <button type="button" onclick="getLocation()">Get My Location</button><br><br>
+            <input type="submit" value="Report Vehicle"
+                style="padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+        </form>
+        {% if message %}
+        <p class="{{ 'message' if 'successfully' in message else 'error' }}">{{ message }}</p>
+        {% endif %}
+        <h2>Your Reported Vehicles</h2>
         {% if vehicles %}
         <table>
             <tr>
                 <th>Number Plate</th>
                 <th>Owner Name</th>
-                <th>Report Date</th>
                 <th>Model</th>
                 <th>Color</th>
-                <th>Description</th>
+                <th>Report Date</th>
+                <th>Documents</th>
             </tr>
             {% for vehicle in vehicles %}
             <tr>
                 <td>{{ vehicle[0] }}</td>
                 <td>{{ vehicle[1] }}</td>
-                <td>{{ vehicle[2] }}</td>
                 <td>{{ vehicle[4] }}</td>
                 <td>{{ vehicle[5] }}</td>
-                <td>{{ vehicle[3] }}</td>
+                <td>{{ vehicle[2] }}</td>
+                <td>
+                    {% if vehicle[6] %}<a href="/{{ vehicle[6] }}">RC</a>{% endif %}
+                    {% if vehicle[7] %}<a href="/{{ vehicle[7] }}">FIR</a>{% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>
         {% else %}
         <p>No vehicles reported yet.</p>
+        {% endif %}
+        <h2>Sightings of Your Vehicles</h2>
+        {% if sightings %}
+        <table>
+            <tr>
+                <th>Number Plate</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>Heading</th>
+                <th>Nearest Station</th>
+            </tr>
+            {% for sighting in sightings %}
+            <tr>
+                <td>{{ sighting[0] }}</td>
+                <td>{{ sighting[1] }}</td>
+                <td>({{ sighting[2] | round(4) }}, {{ sighting[3] | round(4) }})</td>
+                <td>{{ sighting[4] }}</td>
+                <td>{{ sighting[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>No sightings yet.</p>
         {% endif %}
     </div>
     <footer>

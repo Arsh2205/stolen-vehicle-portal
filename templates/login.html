@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Detections - Stolen Vehicle Portal</title>
+    <title>Login - Stolen Vehicle Portal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 400px;
             margin: 20px auto;
             padding: 20px;
             background: white;
@@ -27,10 +27,8 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        pre {
-            background-color: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
+        .error {
+            color: red;
         }
 
         footer {
@@ -52,30 +50,24 @@
 
 <body>
     <header>
-        <h1>Detections & Alerts</h1>
-        <p>
-            <a href="/" style="color: white;">Home</a> |
-            <a href="/status" style="color: white;">Status</a> |
-            <a href="/logout" style="color: white;">Logout</a>
-        </p>
+        <h1>Login</h1>
+        <p><a href="/register" style="color: white;">Register</a></p>
     </header>
     <div class="container">
-        <h2>Detections</h2>
-        {% if detections %}
-        {% for detection in detections %}
-        <pre>{{ detection }}</pre>
-        {% endfor %}
-        {% else %}
-        <p>No detections yet.</p>
+        <h2>Sign In</h2>
+        <form method="POST">
+            <label>Phone Number:</label><br>
+            <input type="text" name="phone" required style="width: 100%; padding: 5px;"><br><br>
+            <label>Password:</label><br>
+            <input type="password" name="password" required style="width: 100%; padding: 5px;"><br><br>
+            <input type="submit" value="Login"
+                style="padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+        </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <p class="error">{{ messages[0] }}</p>
         {% endif %}
-        <h2>Alerts Sent</h2>
-        {% if alerts %}
-        {% for alert in alerts %}
-        <pre>{{ alert }}</pre>
-        {% endfor %}
-        {% else %}
-        <p>No alerts sent yet.</p>
-        {% endif %}
+        {% endwith %}
     </div>
     <footer>
         <p>© 2025 Stolen Vehicle Portal | Powered by xAI</p>
