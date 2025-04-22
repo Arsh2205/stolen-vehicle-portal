@@ -1,5 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask import Flask, request, render_template, redirect, url_for, flash, session
 import sqlite3
 from datetime import datetime
 import threading
@@ -11,14 +10,10 @@ import smtplib
 from email.mime.text import MIMEText
 import logging
 import json
-from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
 
 # File paths
 DB_FILE = "/tmp/stolen_vehicles.db"
@@ -37,22 +32,9 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 # Logging setup
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# User class for Flask-Login
-class User(UserMixin):
-    def __init__(self, id, phone):
-        self.id = id
-        self.phone = phone
-
-@login_manager.user_loader
-def load_user(user_id):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT id, phone FROM users WHERE id = ?", (user_id,))
-    user = c.fetchone()
-    conn.close()
-    if user:
-        return User(user[0], user[1])
-    return None
+# Email config
+EMAIL_SENDER = os.getenv("EMAIL_SENDER", "your.email@gmail.com")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "your_app_password")
 
 # Load police stations
 def load_police_stations():
@@ -75,11 +57,6 @@ def load_police_stations():
 
 POLICE_STATIONS = load_police_stations()
 
-# Email config
-EMAIL_SENDER = os.getenv("EMAIL_SENDER", "your.email@gmail.com")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "your_app_password")
-EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT", "your.email@gmail.com")
-
 # Initialize database
 def init_db():
     conn = sqlite3.connect(DB_FILE)
@@ -87,7 +64,7 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         phone TEXT UNIQUE,
-        password TEXT
+        email TEXT
     )''')
     c.execute('''CREATE TABLE IF NOT EXISTS vehicles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,6 +95,26 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Generate OTP
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+# Send OTP email
+def send_otp_email(email, otp):
+    body = f"Your OTP for Stolen Vehicle Portal is: {otp}\nValid for 5 minutes."
+    msg = MIMEText(body)
+    msg["Subject"] = "Your OTP Code"
+    msg["From"] = EMAIL_SENDER
+    msg["To"] = email
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(EMAIL_SENDER, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_SENDER, email, msg.as_string())
+        logging.info(f"OTP sent to {email}")
+    except Exception as e:
+        logging.error(f"OTP email failed for {email}: {e}")
+
 # Mock ANPR feed
 def generate_mock_anpr_feed():
     conn = sqlite3.connect(DB_FILE)
@@ -126,8 +123,8 @@ def generate_mock_anpr_feed():
     plates = c.fetchall()
     conn.close()
     feed = []
-    for _ in range(10):  # Simulate 10 sightings
-        if random.random() < 0.3 and plates:
+    for _ in range(5):
+        if random.random() < 0.4 and plates:
             number = random.choice(plates)[0]
         else:
             number = f"PB{random.randint(1, 99):02d}{chr(random.randint(65, 90))}{chr(random.randint(65, 90))}{random.randint(1000, 9999)}"
@@ -174,7 +171,7 @@ def predict_next_location(lat, lon, direction):
         lon -= 0.09
     return lat, lon
 
-# Send email alert
+# Send alert email
 def send_alert_email(vehicle, sighting, nearest_station):
     next_lat, next_lon = predict_next_location(sighting["lat"], sighting["lon"], sighting["direction"])
     body = (
@@ -193,16 +190,15 @@ def send_alert_email(vehicle, sighting, nearest_station):
     msg = MIMEText(body)
     msg["Subject"] = f"Stolen Vehicle Alert: {vehicle['number_plate']}"
     msg["From"] = EMAIL_SENDER
-    msg["To"] = EMAIL_RECIPIENT
-
+    msg["To"] = POLICE_STATIONS[nearest_station]["email"]
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
             server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_SENDER, EMAIL_RECIPIENT, msg.as_string())
-        logging.info(f"Email alert sent for {vehicle['number_plate']}")
+            server.sendmail(EMAIL_SENDER, POLICE_STATIONS[nearest_station]["email"], msg.as_string())
+        logging.info(f"Alert sent for {vehicle['number_plate']} to {nearest_station}")
     except Exception as e:
-        logging.error(f"Email failed for {vehicle['number_plate']}: {e}")
+        logging.error(f"Alert email failed for {vehicle['number_plate']}: {e}")
 
 # Background ANPR check
 def check_anpr_feed():
@@ -248,99 +244,96 @@ def check_anpr_feed():
             logging.error(f"ANPR check failed: {e}")
             time.sleep(10)
 
-# Register
-@app.route("/register", methods=["GET", "POST"])
-def register():
+# Verify OTP
+@app.route("/verify", methods=["GET", "POST"])
+def verify():
+    if "phone" not in session or "otp" not in session:
+        return redirect(url_for("home"))
     if request.method == "POST":
-        phone = request.form["phone"]
-        password = generate_password_hash(request.form["password"])
-        try:
+        user_otp = request.form["otp"]
+        if user_otp == session["otp"] and time.time() < session["otp_expiry"]:
+            phone = session["phone"]
+            email = session["email"]
             conn = sqlite3.connect(DB_FILE)
             c = conn.cursor()
-            c.execute("INSERT INTO users (phone, password) VALUES (?, ?)", (phone, password))
+            c.execute("INSERT OR IGNORE INTO users (phone, email) VALUES (?, ?)", (phone, email))
             conn.commit()
-            flash("Registration successful! Please log in.")
-            return redirect(url_for("login"))
-        except sqlite3.IntegrityError:
-            flash("Phone number already registered.")
-        finally:
+            c.execute("SELECT id FROM users WHERE phone = ?", (phone,))
+            user_id = c.fetchone()[0]
             conn.close()
-    return render_template("register.html")
-
-# Login
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        phone = request.form["phone"]
-        password = request.form["password"]
-        conn = sqlite3.connect(DB_FILE)
-        c = conn.cursor()
-        c.execute("SELECT id, phone, password FROM users WHERE phone = ?", (phone,))
-        user = c.fetchone()
-        conn.close()
-        if user and check_password_hash(user[2], password):
-            login_user(User(user[0], user[1]))
+            session["user_id"] = user_id
+            session.pop("otp", None)
+            session.pop("otp_expiry", None)
+            flash("Verification successful!")
             return redirect(url_for("home"))
-        flash("Invalid phone or password.")
-    return render_template("login.html")
+        flash("Invalid or expired OTP.")
+    return render_template("verify.html")
 
-# Logout
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("login"))
-
-# Home page
+# Home page (handles login and vehicle reporting)
 @app.route("/", methods=["GET", "POST"])
-@login_required
 def home():
     init_db()
-    message = ""
+    if "user_id" in session:
+        # Logged in
+        message = ""
+        if request.method == "POST" and "number_plate" in request.form:
+            number_plate = request.form["number_plate"].upper()
+            owner_name = request.form["owner_name"]
+            description = request.form["description"]
+            model = request.form.get("model", "Unknown")
+            color = request.form.get("color", "Unknown")
+            lat = float(request.form["lat"]) if request.form["lat"] else None
+            lon = float(request.form["lon"]) if request.form["lon"] else None
+            rc_file = request.files.get("rc")
+            fir_file = request.files.get("fir")
+            rc_path = fir_path = None
+
+            if rc_file and rc_file.filename.split(".")[-1].lower() in ALLOWED_EXTENSIONS:
+                rc_filename = secure_filename(f"{number_plate}_rc_{int(time.time())}.{rc_file.filename.split('.')[-1]}")
+                rc_path = os.path.join(app.config["UPLOAD_FOLDER"], rc_filename)
+                rc_file.save(rc_path)
+            if fir_file and fir_file.filename.split(".")[-1].lower() in ALLOWED_EXTENSIONS:
+                fir_filename = secure_filename(f"{number_plate}_fir_{int(time.time())}.{fir_file.filename.split('.')[-1]}")
+                fir_path = os.path.join(app.config["UPLOAD_FOLDER"], fir_filename)
+                fir_file.save(fir_path)
+
+            try:
+                conn = sqlite3.connect(DB_FILE)
+                c = conn.cursor()
+                c.execute("INSERT INTO vehicles (user_id, number_plate, owner_name, report_date, description, model, color, rc_path, fir_path, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                          (session["user_id"], number_plate, owner_name, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), description, model, color, rc_path, fir_path, lat, lon))
+                conn.commit()
+                message = f"Vehicle {number_plate} reported successfully!"
+                logging.info(f"Vehicle reported: {number_plate} by user {session['phone']}")
+            except sqlite3.IntegrityError:
+                message = f"Error: Vehicle {number_plate} already reported."
+            except Exception as e:
+                message = f"Error: {e}"
+            finally:
+                conn.close()
+
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("SELECT number_plate, owner_name, report_date, description, model, color, rc_path, fir_path, lat, lon FROM vehicles WHERE user_id = ?", (session["user_id"],))
+        vehicles = c.fetchall()
+        c.execute("SELECT v.number_plate, a.time, a.lat, a.lon, a.direction, a.station_name FROM alerts a JOIN vehicles v ON a.vehicle_id = v.id WHERE v.user_id = ?", (session["user_id"],))
+        sightings = c.fetchall()
+        conn.close()
+        return render_template("index.html", vehicles=vehicles, sightings=sightings, message=message, logged_in=True)
+
+    # Not logged in
     if request.method == "POST":
-        number_plate = request.form["number_plate"].upper()
-        owner_name = request.form["owner_name"]
-        description = request.form["description"]
-        model = request.form.get("model", "Unknown")
-        color = request.form.get("color", "Unknown")
-        lat = float(request.form["lat"]) if request.form["lat"] else None
-        lon = float(request.form["lon"]) if request.form["lon"] else None
-        rc_file = request.files.get("rc")
-        fir_file = request.files.get("fir")
-        rc_path = fir_path = None
-
-        if rc_file and rc_file.filename.split(".")[-1].lower() in ALLOWED_EXTENSIONS:
-            rc_filename = secure_filename(f"{number_plate}_rc_{int(time.time())}.{rc_file.filename.split('.')[-1]}")
-            rc_path = os.path.join(app.config["UPLOAD_FOLDER"], rc_filename)
-            rc_file.save(rc_path)
-        if fir_file and fir_file.filename.split(".")[-1].lower() in ALLOWED_EXTENSIONS:
-            fir_filename = secure_filename(f"{number_plate}_fir_{int(time.time())}.{fir_file.filename.split('.')[-1]}")
-            fir_path = os.path.join(app.config["UPLOAD_FOLDER"], fir_filename)
-            fir_file.save(fir_path)
-
-        try:
-            conn = sqlite3.connect(DB_FILE)
-            c = conn.cursor()
-            c.execute("INSERT INTO vehicles (user_id, number_plate, owner_name, report_date, description, model, color, rc_path, fir_path, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                      (current_user.id, number_plate, owner_name, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), description, model, color, rc_path, fir_path, lat, lon))
-            conn.commit()
-            message = f"Vehicle {number_plate} reported successfully!"
-            logging.info(f"Vehicle reported: {number_plate} by user {current_user.phone}")
-        except sqlite3.IntegrityError:
-            message = f"Error: Vehicle {number_plate} already reported."
-        except Exception as e:
-            message = f"Error: {e}"
-        finally:
-            conn.close()
-
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT number_plate, owner_name, report_date, description, model, color, rc_path, fir_path, lat, lon FROM vehicles WHERE user_id = ?", (current_user.id,))
-    vehicles = c.fetchall()
-    c.execute("SELECT v.number_plate, a.time, a.lat, a.lon, a.direction, a.station_name FROM alerts a JOIN vehicles v ON a.vehicle_id = v.id WHERE v.user_id = ?", (current_user.id,))
-    sightings = c.fetchall()
-    conn.close()
-    return render_template("index.html", vehicles=vehicles, sightings=sightings, message=message)
+        phone = request.form["phone"]
+        email = request.form["email"]
+        otp = generate_otp()
+        session["phone"] = phone
+        session["email"] = email
+        session["otp"] = otp
+        session["otp_expiry"] = time.time() + 300  # 5 minutes
+        send_otp_email(email, otp)
+        flash("OTP sent to your email.")
+        return redirect(url_for("verify"))
+    return render_template("index.html", logged_in=False)
 
 # Police panel
 @app.route("/police", methods=["GET", "POST"])
@@ -362,7 +355,7 @@ def police():
 def admin():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT id, phone FROM users")
+    c.execute("SELECT id, phone, email FROM users")
     users = c.fetchall()
     c.execute("SELECT id, number_plate, owner_name, model, color, report_date FROM vehicles")
     vehicles = c.fetchall()
@@ -381,7 +374,7 @@ def status():
         "detections_file": "OK" if os.path.exists(DETECTIONS_FILE) else "Not Found",
         "alerts_file": "OK" if os.path.exists(ALERTS_FILE) else "Not Found",
         "police_stations": "OK" if POLICE_STATIONS else "Not Loaded",
-        "email_config": "OK" if EMAIL_SENDER and EMAIL_PASSWORD and EMAIL_RECIPIENT else "Missing Variables",
+        "email_config": "OK" if EMAIL_SENDER and EMAIL_PASSWORD else "Missing Variables",
         "last_log": "None"
     }
     try:
